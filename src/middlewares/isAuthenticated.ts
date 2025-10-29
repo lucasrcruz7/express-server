@@ -9,18 +9,16 @@ export function isAuthenticated(req: any, res: Response, next: NextFunction) {
   const authToken = req.headers.authorization;
 
   if (!authToken) {
-    return res.status(401).end();
+    return res.status(401).json({});
   }
-
-  const [, token] = authToken.split(" ");
-
-  // Valida se a variável de ambiente está definida 
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    throw new Error("JWT_SECRET não está definido");
-  }
-
   try {
+    const [, token] = authToken.split(" ");
+
+    // Valida se a variável de ambiente está definida 
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error("JWT_SECRET não está definido");
+    }
     const value = verify(token, secret) as Payload;
 
     // Você pode salvar o payload no req se precisar depois
@@ -28,6 +26,6 @@ export function isAuthenticated(req: any, res: Response, next: NextFunction) {
 
     next();
   } catch (err) {
-    res.status(401).end();
+    res.status(401).json({});
   }
 }

@@ -12,10 +12,11 @@ import { isAuthenticated } from './middlewares/isAuthenticated';
 const router = Router();
 
 // router.get('/alunos', new CreateStudentController().handle)
-router.post('/alunos', isAuthenticated, new CreateStudentController().handle)
+router.post('/alunos', isAuthenticated, checkAdmin, new CreateStudentController().handle)
 // router.get('/alunos/:id', new CreateStudentController().handle)
 // router.put('/alunos/:id', new CreateStudentController().handle)
 // router.delete('/alunos/:id', new CreateStudentController().handle)
+router.get('/auth/user', isAuthenticated, new AuthController().handle )
 
 
 router.post('/login/aluno', new AuthStudentController().handle)

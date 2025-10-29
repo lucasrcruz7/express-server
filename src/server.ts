@@ -9,7 +9,6 @@ app.use(cors());
 app.use(router);
 // middleware de erro (ajustado para retornar)
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.log("teste")
     if (err instanceof Error) {
         return res.status(400).json({ message: err.message });
     }
