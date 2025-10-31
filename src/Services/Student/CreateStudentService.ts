@@ -40,14 +40,12 @@ export class CreateStudentService {
         curso,
         serie,
         rm,                 // matrícula obrigatória
-        senha: senhaHash, // depois você troca para hash de verdade
-        token: randomUUID() // gera token único para QR Code
+        senha: senhaHash, // depois você troca para hash de verdade     
       },
       select: {
         id: true,
         nome: true,
-        rm: true,
-        token: true, // pode retornar para já gerar o QR code
+        rm: true,  
       },
     });
 

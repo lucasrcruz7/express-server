@@ -8,6 +8,7 @@ import { AuthAdminController } from './Controllers/Admin/AuthAdminController';
 import { AuthController } from './Controllers/Auth/AuthController';
 import { checkAdmin } from './middlewares/checkIsAdmin';
 import { isAuthenticated } from './middlewares/isAuthenticated';
+import { CreateQrcodeController } from './Controllers/Qrcode/CreateQrcodeController'
 
 const router = Router();
 
@@ -17,6 +18,10 @@ router.post('/alunos', isAuthenticated, checkAdmin, new CreateStudentController(
 // router.put('/alunos/:id', new CreateStudentController().handle)
 // router.delete('/alunos/:id', new CreateStudentController().handle)
 router.get('/auth/user', isAuthenticated, new AuthController().handle )
+router.post('/qrcode', isAuthenticated, new CreateQrcodeController().handle)
+router.get('/presenca/relatorio', isAuthenticated, new CreateQrcodeController().handleRelatorioPresenca)
+router.post('/qrcode/chamada', isAuthenticated, checkAdmin, new CreateQrcodeController().handleChamadaDaPresenca)
+router.post('/presenca/manual', isAuthenticated, checkAdmin, new CreateQrcodeController().handlePresencaManual)
 
 
 router.post('/login/aluno', new AuthStudentController().handle)

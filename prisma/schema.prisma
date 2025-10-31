@@ -19,7 +19,6 @@ model Aluno {
   responsavelEmail String
   curso            String
   serie            String
-  token            String     @unique
   senha            String
   presencas        Presenca[]
 
@@ -27,12 +26,14 @@ model Aluno {
 }
 
 model Presenca {
-  id       String         @id @default(uuid())
-  data     DateTime       @default(now())
-  presente  Boolean 
-
+  id       String   @id @default(uuid())
+  data     DateTime // agora obrigatório informar ao criar presença
+  presente Boolean
+  token    String   // token único do QRCode do aluno para o dia
   alunoId  String
-  aluno    Aluno          @relation(fields: [alunoId], references: [id])
+  aluno    Aluno    @relation(fields: [alunoId], references: [id])
+
+  @@unique([alunoId, data]) // garante que só haverá uma presença por aluno/dia
 }
 
 generator client {
