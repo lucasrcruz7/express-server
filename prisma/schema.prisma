@@ -32,7 +32,7 @@ model Presenca {
   token    String   // token único do QRCode do aluno para o dia
   alunoId  String
   aluno    Aluno    @relation(fields: [alunoId], references: [id])
-
+  
   @@unique([alunoId, data]) // garante que só haverá uma presença por aluno/dia
 }
 

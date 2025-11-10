@@ -1,17 +1,17 @@
 // src/controllers/user/DeleteUserController.ts
 import { Request, Response } from "express";
-import { DeleteUserService } from "../../Services/Student/DeleteStudentService"
+import { DeleteStudentService } from "../../Services/Student/DeleteStudentService"
 
-class DeleteUserController {
+class DeleteStudentController {
   async handle(req: Request, res: Response) {
     const { id } = req.params; // pegando o id da URL
 
-    const deleteUserService = new DeleteUserService();
+    const deleteStudentService = new DeleteStudentService();
 
-    const student = await deleteUserService.execute({ id });
+    const student = await deleteStudentService.execute({ id });
 
     return res.json(student);
   }
 }
 
-export { DeleteUserController };
+export { DeleteStudentController };

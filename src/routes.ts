@@ -22,6 +22,7 @@ router.post('/qrcode', isAuthenticated, new CreateQrcodeController().handle)
 router.get('/presenca/relatorio', isAuthenticated, new CreateQrcodeController().handleRelatorioPresenca)
 router.post('/qrcode/chamada', isAuthenticated, checkAdmin, new CreateQrcodeController().handleChamadaDaPresenca)
 router.post('/presenca/manual', isAuthenticated, checkAdmin, new CreateQrcodeController().handlePresencaManual)
+router.get('/alunos/presencas', isAuthenticated, checkAdmin, new CreateQrcodeController().handleListagemAlunosPresencas)
 
 
 router.post('/login/aluno', new AuthStudentController().handle)

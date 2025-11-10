@@ -1,11 +1,11 @@
 import prismaClient from "../../Prisma";
 
-interface DeleteUserRequest {
+interface DeleteStudentRequest {
   id: string;
 }
 
-class DeleteUserService {
-  async execute({ id }: DeleteUserRequest) {
+class DeleteStudentService {
+  async execute({ id }: DeleteStudentRequest) {
     const student = await prismaClient.aluno.delete({
       where: {
         id: id,
@@ -16,4 +16,4 @@ class DeleteUserService {
   }
 }
 
-export { DeleteUserService };
+export { DeleteStudentService };

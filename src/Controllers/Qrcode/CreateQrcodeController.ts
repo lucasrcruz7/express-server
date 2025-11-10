@@ -8,8 +8,8 @@ export class CreateQrcodeController {
       return res.status(401).json({ error: 'Somente alunos podem gerar QRCode.' })
     }
     const createQrcodeService = new CreateQrcodeService()
-    const { token } = await createQrcodeService.execute(user.sub)
-    return res.json({ token })
+    const { qrcode } = await createQrcodeService.execute(user.sub)
+    return res.json({ qrcode })
   }
 
   // Remover handleVerifyPresenca (desnecessário)
@@ -45,21 +45,35 @@ export class CreateQrcodeController {
     }
   }
 
-  // Nova: chamada da presença em lote
+  // Nova: chamada da presença
   async handleChamadaDaPresenca(req: Request, res: Response) {
     const user = (req as any).user
     if (!user || user.role !== 'admin') {
       return res.status(401).json({ error: 'Apenas admin pode registrar chamadas.' })
     }
     try {
-      const { tokens } = req.body // tokens: string[]
-      if (!Array.isArray(tokens) || tokens.length === 0) {
-        return res.status(400).json({ error: 'Envie um array de tokens.' })
+      const { token } = req.body // token: string
+      if (!token || typeof token !== 'string') {
+        return res.status(400).json({ error: 'Envie um token válido (string).' })
       }
-      const result = await CreateQrcodeService.chamadaPresencaPorTokens(tokens)
+      const result = await CreateQrcodeService.chamadaPresencaPorToken(token)
       return res.json(result)
     } catch (err: any) {
       return res.status(400).json({ error: err.message })
+    }
+  }
+
+  // Listagem de alunos + presenças
+  async handleListagemAlunosPresencas(req: Request, res: Response) {
+    const user = (req as any).user
+    if (!user || user.role !== 'admin') {
+      return res.status(401).json({ error: 'Apenas admin pode listar.' })
+    }
+    try {
+      const alunos = await CreateQrcodeService.listaAlunosPresencas()
+      return res.json(alunos)
+    } catch (err: any) {
+      return res.status(500).json({ error: err.message })
     }
   }
 }
