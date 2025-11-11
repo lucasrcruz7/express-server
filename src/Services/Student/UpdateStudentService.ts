@@ -1,14 +1,14 @@
 import prismaClient from "../../Prisma";
 
-interface UpdateUserRequest {
+interface UpdateStudentRequest {
   id: string;
   nome: string;
   curso: string;
   serie: string;
 }
 
-class UpdateUserService {
-  async execute({ id, nome, curso, serie }: UpdateUserRequest) {
+class UpdateStudentService {
+  async execute({ id, nome, curso, serie }: UpdateStudentRequest) {
     const student = await prismaClient.aluno.update({
       where: {
         id: id, 
@@ -24,4 +24,4 @@ class UpdateUserService {
   }
 }
 
-export { UpdateUserService };
+export { UpdateStudentService };

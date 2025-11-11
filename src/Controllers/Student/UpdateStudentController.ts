@@ -1,15 +1,15 @@
-// src/controllers/user/UpdateUserController.ts
+// src/controllers/user/UpdateStudentController.ts
 import { Request, Response } from "express";
-import { UpdateUserService } from "../../Services/Student/UpdateStudentService";
+import { UpdateStudentService } from "../../Services/Student/UpdateStudentService";
 
-class UpdateUserController {
+class UpdateStudentController {
   async handle(req: Request, res: Response) {
     const { id } = req.params;
     const { nome, curso, serie } = req.body;
 
-    const updateUserService = new UpdateUserService();
+    const updateStudentService = new UpdateStudentService();
 
-    const student = await updateUserService.execute({
+    const student = await updateStudentService.execute({
       id,
       nome,
       curso,
@@ -20,4 +20,4 @@ class UpdateUserController {
   }
 }
 
-export { UpdateUserController };
+export { UpdateStudentController };
