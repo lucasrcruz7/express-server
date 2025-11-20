@@ -3,10 +3,10 @@ import { CreateStudentService } from '../../Services/Student/CreateStudentServic
 
 export class CreateStudentController{
     async handle(req: Request, res: Response){
-       const {nome, email, responsavelEmail, curso, serie, senha} = req.body
+       const {nome, email, responsavelEmail, curso, serie, senha, telefone, turma} = req.body
 
        const createStudentService = new CreateStudentService();
-       const student = await createStudentService.execute({nome, email, responsavelEmail, curso, serie, senha})
+       const student = await createStudentService.execute({nome, email, responsavelEmail, curso, serie, senha, telefone, turma})
 
        return res.json(student)
     }

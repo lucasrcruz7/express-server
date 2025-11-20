@@ -10,10 +10,12 @@ interface StudentRequest {
   curso: string;
   serie: string;
   senha: string
+  telefone: string
+  turma: string
 }
 
 export class CreateStudentService {
-  async execute({ nome, email, responsavelEmail, curso, serie, senha}: StudentRequest) {
+  async execute({ nome, email, responsavelEmail, curso, serie, senha, telefone, turma}: StudentRequest) {
     if (!email) {
       throw new Error("E-mail nao enviado");
     }
@@ -40,6 +42,8 @@ export class CreateStudentService {
         curso,
         serie,
         rm,                 // matrícula obrigatória
+        telefone,
+        turma,
         senha: senhaHash, // depois você troca para hash de verdade     
       },
       select: {

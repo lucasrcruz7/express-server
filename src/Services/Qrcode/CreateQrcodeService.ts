@@ -4,6 +4,16 @@ import QRCode from 'qrcode'
 
 export class CreateQrcodeService {
   async execute(alunoId: string) {
+    // Verifica se o aluno está ativo
+    const aluno = await prisma.aluno.findUnique({
+      where: { id: alunoId },
+      select: { ativo: true }
+    })
+    
+    if (!aluno || !aluno.ativo) {
+      throw new Error('Aluno desativado não pode gerar QR code.')
+    }
+
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     // Procura se já há token válido para hoje
@@ -19,7 +29,20 @@ export class CreateQrcodeService {
     })
     let token
     if (presencaHoje) {
-      token = presencaHoje.token
+      if(!presencaHoje.token) {
+        token = randomUUID()
+
+        await prisma.presenca.update({
+          where: {
+            id: presencaHoje.id, 
+          },
+          data: {
+            token,
+          },
+        });
+      } else {
+        token = presencaHoje.token
+      }
     } else {
       token = randomUUID()
       await prisma.presenca.create({
@@ -132,7 +155,17 @@ export class CreateQrcodeService {
 
   // Listagem geral
   static async listaAlunosPresencas(faltaPermitidaPercentual = 25) {
-    const alunos = await prisma.aluno.findMany({ select: { id: true, nome: true, rm: true } })
+    const alunos = await prisma.aluno.findMany({ 
+      select: {
+         id: true,
+         nome: true,
+         rm: true, 
+         curso: true, 
+         serie: true, 
+         turma: true
+        }
+     })
+
     const results = []
     for (const aluno of alunos) {
       const relatorio = await this.relatorioPresencaAluno(aluno.id, faltaPermitidaPercentual)
@@ -140,6 +173,10 @@ export class CreateQrcodeService {
         id: aluno.id,
         nome: aluno.nome,
         rm: aluno.rm,
+        curso: aluno.curso,
+        serie: aluno.serie,
+        turma: aluno.turma,
+    
         relatorio: relatorio.presencas
       })
     }

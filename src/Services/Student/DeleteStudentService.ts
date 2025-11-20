@@ -6,9 +6,12 @@ interface DeleteStudentRequest {
 
 class DeleteStudentService {
   async execute({ id }: DeleteStudentRequest) {
-    const student = await prismaClient.aluno.delete({
+    const student = await prismaClient.aluno.update({
       where: {
         id: id,
+      },
+      data: {
+        ativo: false,
       },
     });
 

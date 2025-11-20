@@ -5,7 +5,7 @@ import { UpdateStudentService } from "../../Services/Student/UpdateStudentServic
 class UpdateStudentController {
   async handle(req: Request, res: Response) {
     const { id } = req.params;
-    const { nome, curso, serie } = req.body;
+    const { nome, curso, serie, turma, ativo } = req.body;
 
     const updateStudentService = new UpdateStudentService();
 
@@ -14,6 +14,8 @@ class UpdateStudentController {
       nome,
       curso,
       serie,
+      turma,
+      ativo
     });
 
     return res.json(student);

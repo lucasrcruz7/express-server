@@ -5,10 +5,12 @@ interface UpdateStudentRequest {
   nome: string;
   curso: string;
   serie: string;
+  turma: string
+  ativo: boolean
 }
 
 class UpdateStudentService {
-  async execute({ id, nome, curso, serie }: UpdateStudentRequest) {
+  async execute({ id, nome, curso, serie, turma, ativo }: UpdateStudentRequest) {
     const student = await prismaClient.aluno.update({
       where: {
         id: id, 
@@ -17,6 +19,8 @@ class UpdateStudentService {
         nome,
         curso,
         serie,
+        turma,
+        ativo
       },
     });
 

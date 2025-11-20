@@ -10,6 +10,7 @@ export class CreateQrcodeController {
     const createQrcodeService = new CreateQrcodeService()
     const { qrcode } = await createQrcodeService.execute(user.sub)
     return res.json({ qrcode })
+
   }
 
   // Remover handleVerifyPresenca (desnecessário)
@@ -17,8 +18,8 @@ export class CreateQrcodeController {
   // Nova: adicionar/editar presença manual
   async handlePresencaManual(req: Request, res: Response) {
     const user = (req as any).user
-    if (!user || user.role !== 'admin') {
-      return res.status(401).json({ error: 'Apenas admin pode registrar manualmente.' })
+    if (!user || user.role !== 'professor') {
+      return res.status(401).json({ error: 'Apenas professor pode registrar manualmente.' })
     }
     try {
       const { alunoId, data, presente } = req.body
@@ -48,8 +49,8 @@ export class CreateQrcodeController {
   // Nova: chamada da presença
   async handleChamadaDaPresenca(req: Request, res: Response) {
     const user = (req as any).user
-    if (!user || user.role !== 'admin') {
-      return res.status(401).json({ error: 'Apenas admin pode registrar chamadas.' })
+    if (!user || user.role !== 'professor') {
+      return res.status(401).json({ error: 'Apenas professor pode registrar chamadas.' })
     }
     try {
       const { token } = req.body // token: string

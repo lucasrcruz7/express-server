@@ -6,13 +6,15 @@ export class ReadStudentController {
     async handle(req: Request, res: Response): Promise<void> {
         
         try {
-            const { curso, serie } = req.query;
+            const { curso, serie, turma, ativo } = req.query;
             
             const readStudentService = new ReadStudentService();
 
             const students = await readStudentService.execute({
                 curso: curso as string,
                 serie: serie as string,
+                turma: turma as string,
+                ativo: ativo === 'true' ? true : ativo === 'false' ? false : undefined,
             });
 
             res.json(students);
