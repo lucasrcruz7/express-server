@@ -23,13 +23,33 @@ export class ReadStudentService {
         serie: true,
         turma: true,
         rm: true,
-        ativo: true
+        ativo: true,
+        presencas: {
+          select: {
+            presente: true
+          }
+        }
       },
       orderBy: {
         nome: "asc",
       },
     });
 
-    return students;
+    return students.map(student => {
+      const totalPresencas = student.presencas.length;
+      const presentes = student.presencas.filter(p => p.presente).length;
+      const porcentagemPresenca = totalPresencas > 0 ? (presentes / totalPresencas) * 100 : 0;
+
+      return {
+        id: student.id,
+        nome: student.nome,
+        curso: student.curso,
+        serie: student.serie,
+        turma: student.turma,
+        rm: student.rm,
+        ativo: student.ativo,
+        porcentagemPresenca: Number(porcentagemPresenca.toFixed(2))
+      };
+    });
   } 
 }

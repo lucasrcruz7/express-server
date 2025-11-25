@@ -13,7 +13,22 @@ export class CreateQrcodeController {
 
   }
 
-  // Remover handleVerifyPresenca (desnecessário)
+  async handleRegistrarPresencaPorToken(req: Request, res: Response) {
+    const user = (req as any).user
+    if (!user || user.role !== 'professor') {
+      return res.status(401).json({ error: 'Apenas professor pode registrar presença por token.' })
+    }
+    try {
+      const { token } = req.body
+      if (!token) {
+        return res.status(400).json({ error: 'Token é obrigatório.' })
+      }
+      const result = await CreateQrcodeService.registrarPresencaPorToken(token)
+      return res.json(result)
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message })
+    }
+  }
 
   // Nova: adicionar/editar presença manual
   async handlePresencaManual(req: Request, res: Response) {
@@ -22,11 +37,11 @@ export class CreateQrcodeController {
       return res.status(401).json({ error: 'Apenas professor pode registrar manualmente.' })
     }
     try {
-      const { alunoId, data, presente } = req.body
+      const { alunoId, data, presente, curso, serie, turma } = req.body
       if (!alunoId || data === undefined || presente === undefined) {
         return res.status(400).json({ error: 'Envie alunoId, data (yyyy-mm-dd) e presente (boolean).' })
       }
-      const result = await CreateQrcodeService.registroPresencaManual(alunoId, data, presente)
+      const result = await CreateQrcodeService.registroPresencaManual(alunoId, data, presente, curso, turma, serie)
       return res.json(result)
     } catch (err: any) {
       return res.status(400).json({ error: err.message })
@@ -75,6 +90,36 @@ export class CreateQrcodeController {
       return res.json(alunos)
     } catch (err: any) {
       return res.status(500).json({ error: err.message })
+    }
+  }
+
+  async handleIniciarChamada(req: Request, res: Response) {
+    const user = (req as any).user
+    if (!user || user.role !== 'professor') {
+      return res.status(401).json({ error: 'Apenas professor pode iniciar chamada.' })
+    }
+     const { curso, serie, turma } = req.body
+      if (!curso || !serie || !turma) {
+        return res.status(400).json({ error: 'Curso, série e turma são obrigatórios.' })
+      }
+      const result = await CreateQrcodeService.iniciarChamada(curso, serie, turma)
+      return res.json(result)
+  }
+
+  async handleEncerrarChamada(req: Request, res: Response) {
+    const user = (req as any).user
+    if (!user || user.role !== 'professor') {
+      return res.status(401).json({ error: 'Apenas professor pode encerrar chamada.' })
+    }
+    try {
+      const { curso, serie, turma } = req.body
+      if (!curso || !serie || !turma) {
+        return res.status(400).json({ error: 'Curso, série e turma são obrigatórios.' })
+      }
+      const result = await CreateQrcodeService.encerrarChamada(curso, serie, turma)
+      return res.json(result)
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message })
     }
   }
 }

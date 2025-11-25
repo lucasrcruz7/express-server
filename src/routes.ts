@@ -16,17 +16,25 @@ import { ListProfController } from './Controllers/Professor/ListProfController';
 import { UpdateProfController } from './Controllers/Professor/UpdateProfController';
 import { DeleteProfController } from './Controllers/Professor/DeleteProfController';
 import { checkProfessor } from './middlewares/checkIsProfessor';
+import { ChangePasswordStudentController } from './Controllers/Student/ChangePasswordStudentController';
+import { ChangePasswordProfController } from './Controllers/Professor/ChangePasswordProfController';
 
 const router = Router();
 
 //rotas de aluno
 router.post('/login/aluno', new AuthStudentController().handle)
+router.put('/aluno/senha', isAuthenticated, new ChangePasswordStudentController().handle)
 router.get('/qrcode', isAuthenticated, new CreateQrcodeController().handle)
 router.get('/presenca/relatorio', isAuthenticated, new CreateQrcodeController().handleRelatorioPresenca)
 //rotas de professor
 router.post('/login/professor', new AuthProfController().handle)
+router.put('/professor/senha', isAuthenticated, checkProfessor, new ChangePasswordProfController().handle)
 router.post('/presenca/manual', isAuthenticated, checkProfessor, new CreateQrcodeController().handlePresencaManual)
+router.post('/presenca/registrar-token', isAuthenticated, checkProfessor, new CreateQrcodeController().handleRegistrarPresencaPorToken)
+router.post('/presenca/iniciar-chamada', isAuthenticated, checkProfessor, new CreateQrcodeController().handleIniciarChamada)
+router.post('/presenca/encerrar-chamada', isAuthenticated, checkProfessor, new CreateQrcodeController().handleEncerrarChamada)
 router.post('/qrcode/chamada', isAuthenticated, checkAdmin, new CreateQrcodeController().handleChamadaDaPresenca)
+router.get('/professores', new ListProfController().handle)
 //rotas de admin
 router.post('/login/admin', new AuthAdminController().handle)
 router.post('/alunos', isAuthenticated, checkAdmin, new CreateStudentController().handle)
@@ -37,7 +45,7 @@ router.put('/alunos/:id', isAuthenticated, checkAdmin, new UpdateStudentControll
 router.delete('/alunos/:id', isAuthenticated, checkAdmin, new DeleteStudentController().handle)
 router.get('/alunos/presencas', isAuthenticated, checkAdmin, new CreateQrcodeController().handleListagemAlunosPresencas)
 router.get('/students', new ReadStudentController().handle)
-router.get('/professores', new ListProfController().handle)
+
 
 router.get('/auth/user', isAuthenticated, new AuthController().handle )
 

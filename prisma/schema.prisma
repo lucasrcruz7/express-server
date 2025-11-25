@@ -28,21 +28,24 @@ model Aluno {
   @@index([rm])
 }
 
-model Professor{
-   id       String     @id @default(uuid())
-   nome     String
-   email    String     @unique
-   senha    String
+model Professor {
+  id    String @id @default(uuid())
+  nome  String
+  email String @unique
+  senha String
 }
 
 model Presenca {
   id       String   @id @default(uuid())
   data     DateTime // agora obrigatório informar ao criar presença
   presente Boolean
-  token    String   // token único do QRCode do aluno para o dia
-  alunoId  String   
+  token    String // token único do QRCode do aluno para o dia
+  curso    String
+  serie    String
+  turma    String
+  alunoId  String
   aluno    Aluno    @relation(fields: [alunoId], references: [id])
-  
+
   @@unique([alunoId, data]) // garante que só haverá uma presença por aluno/dia
 }
 

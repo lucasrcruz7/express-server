@@ -44,15 +44,7 @@ export class CreateQrcodeService {
         token = presencaHoje.token
       }
     } else {
-      token = randomUUID()
-      await prisma.presenca.create({
-        data: {
-          alunoId,
-          data: today,
-          presente: false,
-          token,
-        }
-      })
+      throw new Error('Professor nao iniciou a chamada!')
     }
     // Gerar QRCode do token
     const qrcode = await QRCode.toDataURL(token)
@@ -74,7 +66,9 @@ export class CreateQrcodeService {
       where: { id: presenca.id },
       data: { presente: true }
     })
-    return { message: 'Presença registrada com sucesso!' }
+
+    const student = await prisma.aluno.findFirst({ where: { id: presenca.alunoId } })
+    return { student }
   }
 
   // Chamada: registra presente para token e faltas para quem não está no token
@@ -130,11 +124,11 @@ export class CreateQrcodeService {
   }
 
   // Adicionar ou alterar manualmente
-  static async registroPresencaManual(alunoId: string, data: string, presente: boolean) {
+  static async registroPresencaManual(alunoId: string, data: string, presente: boolean, turma: string, serie: string, curso: string) {
     const day = new Date(data)
     day.setHours(0, 0, 0, 0)
     // Tenta atualizar, senão cria
-    let presenca = await prisma.presenca.findFirst({ where: { alunoId, data: day } })
+    let presenca = await prisma.presenca.findFirst({ where: { alunoId, data: day, curso, serie, turma} })
     if (presenca) {
       presenca = await prisma.presenca.update({
         where: { id: presenca.id },
@@ -146,11 +140,77 @@ export class CreateQrcodeService {
           alunoId,
           data: day,
           presente,
+          turma,
+          serie,
+          curso,
           token: '', // token vazio se manual
         }
       })
     }
     return presenca
+  }
+
+  // Iniciar nova chamada
+  static async iniciarChamada(curso: string, serie: string, turma: string) {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    // Busca todos os alunos ativos da turma
+    const alunos = await prisma.aluno.findMany({
+      where: { curso, serie, turma, ativo: true }
+    })
+    
+    if (alunos.length === 0) {
+      throw new Error('Nenhum aluno ativo encontrado para esta turma!')
+    }
+    
+    // Busca presença de cada aluno
+    const presencas = await prisma.presenca.findMany({
+      where: { data: today, curso, serie, turma }
+    })
+
+    const alunosSemPresenca: string[] = []
+
+    const alunosComPresenca = alunos.map(aluno => {
+      const presenca = presencas.find(p => p.alunoId === aluno.id)
+      if (!presenca) {
+        alunosSemPresenca.push(aluno.id)
+      }
+      return {
+        ...aluno,
+        presente: presenca?.presente || false
+      }
+    })
+    
+    if(alunosSemPresenca.length > 0){
+       await prisma.presenca.createMany({
+        data: alunosSemPresenca.map(alunoId => ({
+          alunoId: alunoId,
+          data: today,
+          presente: false,
+          curso,
+          serie,
+          turma,
+          token: ''
+        }))
+      })
+    }
+    
+    
+    return { alunos: alunosComPresenca }
+  }
+
+  // Encerrar chamada
+  static async encerrarChamada(curso: string, serie: string, turma: string) {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    
+    const result = await prisma.presenca.updateMany({
+      where: { data: today, curso, serie, turma, presente: false },
+      data: { presente: false }
+    })
+    
+    return { totalFaltas: result.count }
   }
 
   // Listagem geral

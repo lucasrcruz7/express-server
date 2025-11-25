@@ -7,20 +7,16 @@ export class AuthProfController{
         const {email,senha} = req.body
 
         if(!email || !senha){
-            return res.status(400).json({error: "Email e senha são obrigatórios"})
+            throw new Error("Email e senha são obrigatórios")
         }
+        
+        const authProfService = new AuthProfService
 
-        try{
-            const authProfService = new AuthProfService
+        const auth = await authProfService.execute({
+            email,
+            senha
+        })
 
-            const auth = await authProfService.execute({
-                email,
-                senha
-            })
-
-            return res.json(auth)
-        }catch(err: any){
-            return res.status(400).json({error: err.message})
-        }
+        return res.json(auth)
     }
 }
