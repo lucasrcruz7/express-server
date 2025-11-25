@@ -10,73 +10,71 @@ export class CreateQrcodeController {
     const createQrcodeService = new CreateQrcodeService()
     const { qrcode } = await createQrcodeService.execute(user.sub)
     return res.json({ qrcode })
-
   }
 
   async handleRegistrarPresencaPorToken(req: Request, res: Response) {
     const user = (req as any).user
+
     if (!user || user.role !== 'professor') {
       return res.status(401).json({ error: 'Apenas professor pode registrar presença por token.' })
     }
-    try {
-      const { token } = req.body
-      if (!token) {
-        return res.status(400).json({ error: 'Token é obrigatório.' })
-      }
-      const result = await CreateQrcodeService.registrarPresencaPorToken(token)
-      return res.json(result)
-    } catch (err: any) {
-      return res.status(400).json({ error: err.message })
+
+    const { token } = req.body
+
+    if (!token) {
+      return res.status(400).json({ error: 'Token é obrigatório.' })
     }
+    
+    const result = await CreateQrcodeService.registrarPresencaPorToken(token)
+    return res.json(result)
+
   }
 
   // Nova: adicionar/editar presença manual
   async handlePresencaManual(req: Request, res: Response) {
     const user = (req as any).user
+
     if (!user || user.role !== 'professor') {
       return res.status(401).json({ error: 'Apenas professor pode registrar manualmente.' })
     }
-    try {
-      const { alunoId, data, presente, curso, serie, turma } = req.body
-      if (!alunoId || data === undefined || presente === undefined) {
-        return res.status(400).json({ error: 'Envie alunoId, data (yyyy-mm-dd) e presente (boolean).' })
-      }
-      const result = await CreateQrcodeService.registroPresencaManual(alunoId, data, presente, curso, turma, serie)
-      return res.json(result)
-    } catch (err: any) {
-      return res.status(400).json({ error: err.message })
+
+    const { alunoId, data, presente, curso, serie, turma } = req.body
+
+    if (!alunoId || data === undefined || presente === undefined) {
+      return res.status(400).json({ error: 'Envie alunoId, data (yyyy-mm-dd) e presente (boolean).' })
     }
+
+    const result = await CreateQrcodeService.registroPresencaManual(alunoId, data, presente, curso, turma, serie)
+    return res.json(result)
   }
 
   async handleRelatorioPresenca(req: Request, res: Response) {
     const user = (req as any).user
+
     if (!user || user.role !== 'aluno') {
       return res.status(401).json({ error: 'Somente alunos podem consultar seu relatório.' })
     }
-    try {
-      const relatorio = await CreateQrcodeService.relatorioPresencaAluno(user.sub)
-      return res.json(relatorio)
-    } catch (err: any) {
-      return res.status(400).json({ error: err.message })
-    }
+    const relatorio = await CreateQrcodeService.relatorioPresencaAluno(user.sub)
+
+    return res.json(relatorio)
   }
 
   // Nova: chamada da presença
   async handleChamadaDaPresenca(req: Request, res: Response) {
     const user = (req as any).user
+
     if (!user || user.role !== 'professor') {
       return res.status(401).json({ error: 'Apenas professor pode registrar chamadas.' })
     }
-    try {
-      const { token } = req.body // token: string
-      if (!token || typeof token !== 'string') {
-        return res.status(400).json({ error: 'Envie um token válido (string).' })
-      }
-      const result = await CreateQrcodeService.chamadaPresencaPorToken(token)
-      return res.json(result)
-    } catch (err: any) {
-      return res.status(400).json({ error: err.message })
+
+    const { token } = req.body // token: string
+
+    if (!token || typeof token !== 'string') {
+      return res.status(400).json({ error: 'Envie um token válido (string).' })
     }
+
+    const result = await CreateQrcodeService.chamadaPresencaPorToken(token)
+    return res.json(result)
   }
 
   // Listagem de alunos + presenças
