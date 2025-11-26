@@ -1,6 +1,7 @@
 import prisma from '../../Prisma'
 import { randomUUID } from 'crypto'
 import QRCode from 'qrcode'
+import { EmailService } from '../Email/EmailService'
 
 export class CreateQrcodeService {
   async execute(alunoId: string) {
@@ -68,6 +69,16 @@ export class CreateQrcodeService {
     })
 
     const student = await prisma.aluno.findFirst({ where: { id: presenca.alunoId } })
+    
+    if (student?.responsavelEmail) {
+      await EmailService.enviarNotificacaoPresenca(
+        student.responsavelEmail,
+        student.nome,
+        true,
+        presenca.data
+      )
+    }
+    
     return { student }
   }
 
@@ -104,15 +115,19 @@ export class CreateQrcodeService {
 
   // Serviço para relatório de presença do aluno
   static async relatorioPresencaAluno(alunoId: string, faltaPermitidaPercentual = 25) {
+    const student = await prisma.aluno.findFirst({ where: { id: alunoId } })
+    const baseWherePresencas = {
+      serie: student?.serie,
+      curso: student?.curso,
+      alunoId: alunoId
+    }
     // considera o total de datas de presença já registradas no banco
     const totalAulas = await prisma.presenca.count({
-      where: {
-        alunoId
-      }
+      where: baseWherePresencas
     })
     const totalPresencas = await prisma.presenca.count({
       where: {
-        alunoId,
+        ...baseWherePresencas,
         presente: true
       }
     })
@@ -147,6 +162,17 @@ export class CreateQrcodeService {
         }
       })
     }
+    
+    const aluno = await prisma.aluno.findUnique({ where: { id: alunoId } })
+    if (aluno?.responsavelEmail) {
+        EmailService.enviarNotificacaoPresenca(
+        aluno.responsavelEmail,
+        aluno.nome,
+        presente,
+        day
+      )
+    }
+    
     return presenca
   }
 

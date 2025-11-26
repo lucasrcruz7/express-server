@@ -9,6 +9,7 @@ interface ReadStudentParams {
 
 export class ReadStudentService {
   async execute({ curso, serie, turma, ativo }: ReadStudentParams = {}) {
+
     const students = await prismaClient.aluno.findMany({
       where: {
         ...(curso && { curso }),
@@ -24,15 +25,21 @@ export class ReadStudentService {
         turma: true,
         rm: true,
         ativo: true,
+
         presencas: {
+          where: {
+            ...(curso && { curso }),
+            ...(serie && { serie }),
+          },
           select: {
-            presente: true
+            presente: true,
           }
         }
       },
+
       orderBy: {
         nome: "asc",
-      },
+      }
     });
 
     return students.map(student => {

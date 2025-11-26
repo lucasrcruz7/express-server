@@ -24,7 +24,7 @@ export class CreateQrcodeController {
     if (!token) {
       return res.status(400).json({ error: 'Token é obrigatório.' })
     }
-    
+
     const result = await CreateQrcodeService.registrarPresencaPorToken(token)
     return res.json(result)
 
@@ -44,7 +44,7 @@ export class CreateQrcodeController {
       return res.status(400).json({ error: 'Envie alunoId, data (yyyy-mm-dd) e presente (boolean).' })
     }
 
-    const result = await CreateQrcodeService.registroPresencaManual(alunoId, data, presente, curso, turma, serie)
+    const result = await CreateQrcodeService.registroPresencaManual(alunoId, data, presente, turma, serie, curso)
     return res.json(result)
   }
 
